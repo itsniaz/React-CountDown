@@ -17,13 +17,10 @@ export default class Counter extends Component
             milsec : "00",
             
             status : 0,
-
-            ihr : "0", 
-            imin : "0", 
-            isec : "0", 
-          
-
+            counter : 0,
         };
+
+        this.updateUI = this.updateUI.bind(this);
     }
 
   
@@ -32,64 +29,79 @@ export default class Counter extends Component
         // this.setState
     }
 
+    updateUI()
+    {
+        var ms  = String(parseInt((this.state.counter) % 100, 10));
+        // console.log(ms)
+        if(ms.length ==1)
+        {
+            ms = "0" + ms
+        }
+     
+        var s =  String(parseInt((this.state.counter/ 1000) % 60));
+
+        if(s.length==1)
+        {
+            s = "0" + s
+        }
+     
+
+        var min = String(parseInt((this.state.counter / 60000) % 60 , 10)); 
+
+        if(min.length == 1)
+        {
+            min = "0" + min
+        }
+    
+        var hr = String(Math.floor((this.state.counter/ 3600000))); 
+
+    
+
+        if(hr.length == 1)
+        {
+            hr = "0" + hr
+        }
+
+
+        this.setState(
+            {
+                counter : this.state.counter + 33,
+                milsec : ms,
+                sec : s,
+                min : min,
+                hr : hr
+            });
+    }
 
     componentDidMount()
     {
-        console.log(this.state.status);
-
-    
-        // setInterval(()=>
-        // {
-        //     this.setState({hr : Number(this.state.hr)+1})
-        // }
-        // ,
-        // 60)
-
-        if(this.state.status == 1)
-        {
-            var hr = Number(this.state.hr);
-            var min = Number(this.state.min);
-            var sec = Number(this.state.sec);
-            // var milsec = Number(this.state.milsec);
-    
-            if(!(hr>=this.state.ihr))
-            {
-                this.interval = setInterval(()=>
-                {
-                    this.setState({hr : Number(this.state.hr+1)})
-                }
-                ,
-                1000*60*60)
-            }
-            if(!(min>=this.state.imin))
-            {
-                this.interval = setInterval(()=>
-                {
-                    this.setState({min : Number(this.state.min+1)})
-                }
-                ,
-                1000*60)
-            }
-            if(!(this.state.sec >= this.state.isec))
-            {
-                console.log(this.state.sec,this.state.isec);
-                setInterval(()=>
-                {
-                   this.interval =  this.setState({sec : Number(this.state.sec+1)  })
-                }
-                ,
-                1000)
-            }
-         
-        }
         
+        if(this.timer)
+        {
+            this.timer = setInterval(this.updateUI, 33);
+        }
     }
     
     handleStartClick = ()=>
-    {
+    {   
+      
+        if(!this.timer)
+        {
+          this.timer = setInterval(this.updateUI, 33);
+        }
+      
         
-            this.setState({status : 1});
-            this.componentDidMount(); 
+    }
+
+    handlePauseClick = ()=>
+    {
+        // clearInterval(this.timer);
+        // this.setState({
+        //     hr : "00",
+        //     min : "00",
+        //     sec : "00",
+        //     milsec : "00"
+        // })
     }
   
     handleChange =  (event)=>
@@ -140,7 +152,7 @@ export default class Counter extends Component
              <span style={inp}> hours </span>
              <input type="text" style={inp} className="form-control" placeholder="0" id="imin" onChange={this.handleChange}></input>
              <span style={inp}> minutes </span>
-             <input type="text" style={inp} placeholder="0" className="form-control" id="isec"  onChange={this.handleChange}></input>
+             <input type="text" style={inp} placeholder="0" className="form-control" id="isec"  onChange={this.handleChange} value={this.state.sec}></input>
              <span style={inp}> seconds </span>
              <br></br>
              <br></br>
@@ -148,6 +160,9 @@ export default class Counter extends Component
              <button type="button" className="btn btn-success" style={spacing} onClick={this.handleStartClick}>Start</button>
              <button type="button" className="btn btn-warning" style={spacing}>Pause</button>
              <button type="button" className="btn btn-danger" style={spacing}>Stop</button>
+             <br>
+             </br>
+             {/* <h3>{this.state.counter}</h3> */}
              {/* <div className="count" onClick={this.handleIncrement}>{this.state.count}</div> */}
          </div>
           
